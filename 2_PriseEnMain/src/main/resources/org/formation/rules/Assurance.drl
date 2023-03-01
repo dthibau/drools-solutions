@@ -1,0 +1,58 @@
+//created on: 5 avr. 2015
+package org.formation.rules
+
+//list any import classes here.
+import org.formation.model.stateless.Conducteur;
+import org.formation.model.stateless.Assurance;
+
+
+
+
+rule "conducteur entre 18 et 25 ans"
+
+    when
+        //conditions
+        Conducteur(age > 18, age <= 25)
+        $a : Assurance()
+    then
+        //actions
+        $a.setPrixBase(500d);
+		System.out.println("RULE Assurance prixBase = "+$a.getPrixBase());
+end
+
+rule "conducteur a plus de 25 ans"
+    //include attributes such as "salience" here...
+    when
+        //conditions
+        Conducteur( age > 25 )
+        $a : Assurance()
+    then
+        //actions
+		$a.setPrixBase(300d);
+end
+rule "conducteur a 5 ans d'ancienteté"
+	when
+		Conducteur( anciennete >= 5 )
+		$a : Assurance(  )
+	then
+		$a.setRemise( $a.getRemise() + 10d);
+end
+rule "conducteur a 10 ans d'ancienneté"
+	when
+		Conducteur( anciennete >= 10 )
+		$a : Assurance(  )
+	then
+		$a.setRemise($a.getRemise() + 10d);		
+end
+
+rule "malus de 5% par nombre d'incident"
+	when
+		Conducteur( $i : incidents )
+		$a : Assurance(  )
+	then
+		$a.setRemise($a.getRemise() - 5 * $i);
+end
+
+
+
+

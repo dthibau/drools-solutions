@@ -12,19 +12,27 @@ import org.kie.api.runtime.StatelessKieSession;
 import org.kie.api.runtime.rule.FactHandle;
 
 public class RuleRunner {
+	KieContainer kieContainer;
 	KieSession kSession;
 	KieRuntimeLogger logger;
 
 	public RuleRunner() {
+		// Instancier un container basé sur le classpath
+		KieServices kServices = KieServices.Factory.get();
+		kieContainer = kServices.getKieClasspathContainer();
+
+
 	}
 
 	public void runStatelessRules(Object[] facts)
 			throws Exception {
-		// Instancier un container basé sur le classpath
-
-		// Instancier une session stateless
 		
+		// Instancier une session stateless
+		StatelessKieSession statelessKieSession = kieContainer.newStatelessKieSession();
+	
 		// Exécuter les règles
+		statelessKieSession.execute(Arrays.asList(facts));
+
 	}
 
 	/**

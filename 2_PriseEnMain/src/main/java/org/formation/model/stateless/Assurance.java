@@ -20,7 +20,7 @@ public class Assurance {
 	}
 	
 	public double getPrix() {
-		return prixBase - remise*prixBase/100;
+		return prixBase != null ? prixBase - remise*prixBase/100 : -1;
 	}
 	
 }
