@@ -4,45 +4,132 @@ package org.formation.rules
 //list any import classes here.
 import org.formation.model.stateful.*;
 
+query "room where sprinkler is on" //(String name)
+	$r : Room(  )
+	$sp : Sprinkler( on == true, room == $r )
+end
+
+query getSprinkler (Number $result)
+ $result := Number() from accumulate ($f : Sprinkler( on == true  ), count($f))
+// $ $total
+end
+
 
 //declare any global variables here
+declare PanicMode
+	on : boolean
+end
+/*********************************************
+* Always active rules
+**********************************************/
 
+rule "always panic object"
+salience 100
+	when
+		not PanicMode()
+	then
+		insert(new PanicMode(false));
+		System.out.println("Immeuble initialisé");
+end
 
+rule "Number of Sprinkler on"
+salience 99
+	when
+		getSprinkler($totalOn;)
+	then
+		System.out.println("Total Sprinkler on "+$totalOn);
+end
+
+rule "raise an alarm"
+	timer(int: 5s)
+    when
+        exists Fire( ) //Fire()
+    then
+        insertLogical(new Alarm());
+        System.out.println("Alarm !! ");
+end
+
+rule "send Sms"
+		//timer (cron:0/5 * * * * ?)
+		timer(int:0 5s)
+	when
+		$a : Alarm()
+	then
+		System.out.println("Send SMS");
+end
+/********************************************************
+* rule agenda management
+*********************************************************/
+rule "more than 1 fire is panic mode"
+	timer(int: 1s 5s)
+	when
+		Number( intValue >= 2) from accumulate ($f : Fire(  ); count($f))
+		$p : PanicMode()
+	then
+		modify($p){setOn(true)};
+		drools.setFocus("panicMode");
+		System.out.println("Immeuble en mode Panic !");
+end
+
+rule "less than 2 fires is normal mode"
+	timer(int: 1s 5s)
+	when
+		Number(intValue < 2 ) from accumulate ($f : Fire(  ); count($f))
+		$p : PanicMode()
+	then
+		modify($p){setOn(false)};
+		drools.setFocus("normalMode");
+		System.out.println("Immeuble en mode normal");
+end
+/********************************************************
+*  Normal mode rules
+*********************************************************/
+rule "turn on sprinkler"
+agenda-group "normalMode"
+	when
+		Fire( $room : room  )
+		$sprinkler : Sprinkler( room == $room, on == false )
+	then
+		modify($sprinkler){setOn(true)};
+		System.out.println("turn on sprinkler for room "+$room.getName());
+end
+
+rule "turn off sprinkler"
+agenda-group "normalMode"
+	when
+		$room : Room(  )
+		not Fire( room == $room  )
+		$sprinkler : Sprinkler( on == true, room == $room )
+	then
+		modify($sprinkler){setOn(false)};
+		System.out.println("turn OFF sprinkler for room "+$room.getName());
+end
 rule "no fire"
-
+agenda-group "normalMode"
     when
         not Alarm(  )
         not Sprinkler( on == true  )
     then
-        channels["console-channel"].send("it's OK");
+        System.out.println("it's OK ");
 end
-
-rule "raise alarm"
-    when
-        exists Fire( )
-    then
-        insertLogical(new Alarm());//insert(new Alarm());
-        channels["console-channel"].send("Alarm");
-end
-
-rule "turn on sprinkler"
+/************************************************************
+*    Panic mode rules
+*************************************************************/
+rule "Set all sprinkler on"
+agenda-group "panicMode"
+salience 1
 	when
-		Fire( $room : room  )
-		$sprinkler : Sprinkler( room == $room)
+		$sp: Sprinkler( on == false )
 	then
-		modify($sprinkler){setOn(true)};
-		channels["console-channel"].send("turn on sprinkler for room "+$room.getName());
+		modify($sp){setOn(true)};
+		System.out.println("Start sprinkler for "+$sp.getRoom().getName());
 end
 
-
-rule "turn off sprinkler 2"
+rule "general evacuation"
+agenda-group "panicMode"
+salience 0
 	when
-		$sprinkler : Sprinkler( on == true, $room : room )
-		not Fire( room == $room  )
 		
 	then
-		modify($sprinkler){setOn(false)};
-		System.out.println("turn OFF sprinkler 2 for room "+$room.getName());
+		System.out.println("general evacuation !!");
 end
-
-
