@@ -1,0 +1,48 @@
+//created on: 5 avr. 2015
+package org.formation.rules
+
+//list any import classes here.
+import org.formation.model.stateful.*;
+
+
+//declare any global variables here
+
+
+rule "no fire"
+
+    when
+        not Alarm(  )
+        not Sprinkler( on == true  )
+    then
+        channels["console-channel"].send("it's OK");
+end
+
+rule "raise alarm"
+    when
+        exists Fire( )
+    then
+        insertLogical(new Alarm());//insert(new Alarm());
+        channels["console-channel"].send("Alarm");
+end
+
+rule "turn on sprinkler"
+	when
+		Fire( $room : room  )
+		$sprinkler : Sprinkler( room == $room)
+	then
+		modify($sprinkler){setOn(true)};
+		channels["console-channel"].send("turn on sprinkler for room "+$room.getName());
+end
+
+
+rule "turn off sprinkler 2"
+	when
+		$sprinkler : Sprinkler( on == true, $room : room )
+		not Fire( room == $room  )
+		
+	then
+		modify($sprinkler){setOn(false)};
+		System.out.println("turn OFF sprinkler 2 for room "+$room.getName());
+end
+
+
