@@ -1,14 +1,12 @@
 package org.formation.model.stateful;
 
 public class Sprinkler {
-
 	private Room room;
 	private boolean on = false;
-
 	public Sprinkler(Room room) {
+		super();
 		this.room = room;
 	}
-	
 	public Room getRoom() {
 		return room;
 	}
@@ -21,11 +19,9 @@ public class Sprinkler {
 	public void setOn(boolean on) {
 		this.on = on;
 	}
-
 	@Override
 	public String toString() {
-		return "Sprinkler [on=" + on + ", room=" + room + "]";
+		return "Sprinkler on : "+on+", room: "+room;
 	}
-	
 	
 }

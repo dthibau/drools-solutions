@@ -1,13 +1,13 @@
 package org.formation.model.stateful;
 
 public class Fire {
-
 	private Room room;
 
 	public Fire(Room room) {
+		super();
 		this.room = room;
 	}
-	
+
 	public Room getRoom() {
 		return room;
 	}
@@ -18,8 +18,7 @@ public class Fire {
 
 	@Override
 	public String toString() {
-		return "Fire [room=" + room + "]";
+		return "Fire in room : "+room;
 	}
-	
 	
 }

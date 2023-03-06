@@ -1,5 +1,8 @@
 package org.formation.test;
 
+import java.util.Collection;
+
+import org.drools.core.common.DefaultFactHandle;
 import org.formation.helper.RuleRunner;
 import org.formation.model.stateful.Alarm;
 import org.formation.model.stateful.Fire;
@@ -10,7 +13,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.api.definition.type.FactType;
 import org.kie.api.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 
 public class TestFire {
 	static RuleRunner ruleRunner;
@@ -19,41 +25,51 @@ public class TestFire {
 	Room salon = new Room("salon");
 	Sprinkler sprinklerKitchen = new Sprinkler(kitchen);
 	Sprinkler sprinklerSalon = new Sprinkler(salon);
-	
+
 	@BeforeClass
-	public static void init(){
+	public static void init() {
 		ruleRunner = new RuleRunner();
 	}
+
+	@After
+	public void end() {
+		ruleRunner.closeLogger();
+		ruleRunner.disposeSession();
+	}
+
 	@Before
 	public void initTest() {
 		ruleRunner.initStatefulSession();
 	}
-	@After
-	public void end() {
-		ruleRunner.closeLogger();
-		ruleRunner.disposeSession();		
-	}
+
 	@Test
-	public void testNofire(){
-		// Insérer les faits (les différentes pièces et les Sprinkler associés)
-		Object[] facts =new Object[4];
+	public void testNofire() {
+		Object[] facts = new Object[4];
 		facts[0] = kitchen;
 		facts[1] = salon;
 		facts[2] = sprinklerKitchen;
 		facts[3] = sprinklerSalon;
 
 		factHandles = ruleRunner.insertFacts(facts);
-		ruleRunner.fireAllRules();
-		
-		// Déclencher les règles
-		System.out.println("************ No Fire ************");
+
+		ruleRunner.fireUntillHalt();
+
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		Assert.assertFalse(sprinklerKitchen.isOn());
+		_testPanicMode(false);
+
+
 	}
+
 	@Test
-	public void testFireInKitchen(){
-		System.out.println("************ FIRE In Kitchen ************");
-		// Insérer les faits (feu dans la cusine)
-		Object[] facts =new Object[5];
+	public void testFireInKitchen() {
+		Object[] facts = new Object[5];
 		facts[0] = kitchen;
 		facts[1] = salon;
 		facts[2] = sprinklerKitchen;
@@ -61,17 +77,26 @@ public class TestFire {
 		facts[4] = new Fire(kitchen);
 
 		ruleRunner.insertFacts(facts);
-		ruleRunner.fireAllRules();
-		
-		// Déclencher les règles
+		ruleRunner.fireUntillHalt();
+
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		Assert.assertTrue(sprinklerKitchen.isOn());
+		_testPanicMode(false);
+
+		ruleRunner.halt();
+
 	}
+
 	@Test
-	public void testStopFireInKitchen(){
-		System.out.println("************ Stop fire In Kitchen ************");
-		// Insérer les faits (feu dans la cusine)
-		
-		Object[] facts =new Object[5];
+	public void testStopFireInKitchen() {
+		System.out.println("********** Stop Fire In Kitchen **********");
+		Object[] facts = new Object[5];
 		facts[0] = kitchen;
 		facts[1] = salon;
 		facts[2] = sprinklerKitchen;
@@ -79,21 +104,31 @@ public class TestFire {
 		facts[4] = new Fire(kitchen);
 
 		factHandles = ruleRunner.insertFacts(facts);
-		ruleRunner.fireAllRules();
-		
+		ruleRunner.fireUntillHalt();
+		try {
+			Thread.sleep(6000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Assert.assertTrue(sprinklerKitchen.isOn());
 		Assert.assertTrue(existAlarm());
 		ruleRunner.retractFact(factHandles[4]);
-		ruleRunner.fireAllRules();
+		try {
+			Thread.sleep(6000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		Assert.assertFalse(existAlarm());
+		ruleRunner.halt();
 	}
 
-
 	@Test
-	public void testStopFireInSalonButStillFireInKitchen(){
-		System.out.println("************ Stop Fire In Salon But Still In Kitchen ************");
-		// Insérer les faits (feu dans la cuisine ET le salon)
-		Object[] facts =new Object[6];
+	public void testStopFireInKitchenButStillFireInSalon() {
+		System.out.println("********** Stop Fire In Salon But Still Fire In Kitchen **********");
+		Object[] facts = new Object[6];
 		facts[0] = kitchen;
 		facts[1] = salon;
 		facts[2] = sprinklerKitchen;
@@ -101,29 +136,62 @@ public class TestFire {
 		facts[4] = new Fire(kitchen);
 		facts[5] = new Fire(salon);
 
-		//lancer les règles
 		factHandles = ruleRunner.insertFacts(facts);
-		ruleRunner.fireAllRules();
+		ruleRunner.fireUntillHalt();
+		try {
+			Thread.sleep(7000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		Assert.assertTrue(sprinklerKitchen.isOn());
 		Assert.assertTrue(sprinklerSalon.isOn());
 		Assert.assertTrue(existAlarm());
+		_testPanicMode(true);
 
-		//Eteindre le feu dans le salon
-		ruleRunner.retractFact(factHandles[5]);
-		
-		//relancer les règles
-		ruleRunner.fireAllRules();
-
-		Assert.assertTrue(sprinklerKitchen.isOn());
-		Assert.assertFalse(sprinklerSalon.isOn());
+		ruleRunner.retractFact(factHandles[4]);
+		try {
+			Thread.sleep(7000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Assert.assertFalse(sprinklerKitchen.isOn());
+		Assert.assertTrue(sprinklerSalon.isOn());
 		Assert.assertTrue(existAlarm());
+		_testPanicMode(false);
+
+		ruleRunner.halt();
+		printRoomWithSprinklerOn();
+	}
+
+	private void printRoomWithSprinklerOn() {
+		QueryResults qr = ruleRunner.executeQuery("room where sprinkler is on");
+		System.out.println("------QueryResults:" + qr.size());
+		for (QueryResultsRow row : qr) {
+			Room room = (Room) row.get("$r");
+			System.out.println("Sprinkler is on for " + room.getName());
+		}
+
 	}
 
 	private boolean existAlarm() {
+		Collection<FactHandle> fHandles = ruleRunner.getFacts(Alarm.class);
+		System.out.println("there is " + fHandles.size() + " alarm(s) ");
+		if (fHandles.size() > 0)
+			return true;
+		return false;
+	}
 
-		// A completer, utiliser la méthode de ruleRunner appropriée
-		return ruleRunner.getFacts(	Alarm.class).size() > 0;
+	private void _testPanicMode(boolean expected) {
+		FactType panicModeType = ruleRunner.getKieBase().getFactType("org.formation.rules", "PanicMode");
 
+		Assert.assertNotNull(panicModeType);
+		Collection<FactHandle> panicModes = ruleRunner.getFacts(panicModeType.getFactClass());
+		Assert.assertEquals(1, panicModes.size());
+		panicModes.forEach(pm -> {
+			Assert.assertEquals(expected, panicModeType.get(((DefaultFactHandle) pm).getObject(), "on"));
+		});
 	}
 }
