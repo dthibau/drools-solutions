@@ -61,7 +61,7 @@ end
 * rule agenda management
 *********************************************************/
 rule "more than 1 fire is panic mode"
-	timer(int: 1s 5s)
+//	timer(int: 1s 5s)
 	when
 		Number( intValue >= 2) from accumulate ($f : Fire(  ); count($f))
 		$p : PanicMode()
@@ -72,7 +72,7 @@ rule "more than 1 fire is panic mode"
 end
 
 rule "less than 2 fires is normal mode"
-	timer(int: 1s 5s)
+//	timer(int: 1s 5s)
 	when
 		Number(intValue < 2 ) from accumulate ($f : Fire(  ); count($f))
 		$p : PanicMode()
