@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
+	<!-- This is a minimal kmodule.xml. Ref Drools documentation, see http://docs.jboss.org/drools/release/6.1.0.Final/drools-docs/html_single/index.html#d0e1112 -->
+<kbase name="KBase" default="true" eventProcessingMode="cloud" equalsBehavior="equality">
+    <ksession name="KSession2_1" type="stateful" default="true">
+ <listeners>
+    <processEventListener type="org.formation.drools.helper.MyProcessListener"/>
+  </listeners>   
+    </ksession>
+    <ksession name="KSession2_2" type="stateless" default="false" beliefSystem="jtms"/>
+</kbase>
+</kmodule>

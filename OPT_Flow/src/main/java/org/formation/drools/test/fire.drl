@@ -1,0 +1,70 @@
+//created on: 5 avr. 2015
+package org.formation.drools.rules
+
+//list any import classes here.
+import org.formation.drools.model.stateful.*;
+
+
+/********************************************************
+*  Normal mode rules
+*********************************************************/
+rule "Im here"
+ruleflow-group "normalMode"
+salience 2
+	when
+
+	then
+
+		System.out.println("IM a rule from normalMode");
+end
+
+
+rule "turn on sprinkler"
+ruleflow-group "normalMode"
+	when
+		Fire( $room : room  )
+		$sprinkler : Sprinkler( room == $room, on == false )
+	then
+		modify($sprinkler){setOn(true)};
+		System.out.println("normalMode turn on sprinkler for room "+$room.getName());
+end
+
+rule "turn off sprinkler"
+ruleflow-group "normalMode"
+	when
+		$room : Room(  )
+		not Fire( room == $room  )
+		$sprinkler : Sprinkler( on == true, room == $room )
+	then
+		modify($sprinkler){setOn(false)};
+		System.out.println("normalMode turn OFF sprinkler for room "+$room.getName());
+end
+rule "no fire"
+ruleflow-group "normalMode"
+    when
+        not Alarm(  )
+        not Sprinkler( on == true  )
+    then
+        System.out.println("it's OK ");
+end
+/************************************************************
+*    Panic mode rules
+*************************************************************/
+rule "Set all sprinkler on"
+ruleflow-group "panicMode"
+salience 0
+	when
+		$sp: Sprinkler( on == false )
+	then
+		modify($sp){setOn(true)};
+		System.out.println("panicMode Start sprinkler for "+$sp.getRoom().getName());
+end
+
+rule "general evacuation"
+ruleflow-group "panicMode"
+salience 1
+	when
+		
+	then
+		System.out.println("panicMode general evacuation !!");
+end
