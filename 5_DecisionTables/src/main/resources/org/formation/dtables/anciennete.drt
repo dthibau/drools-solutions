@@ -1,0 +1,24 @@
+template header
+ageMin
+ageMax
+prixBase
+anciennete
+incidents
+remise
+
+package org.formation.drools.rules
+
+import org.formation.model.stateless.Conducteur;
+import org.formation.model.stateless.Assurance;
+
+global Assurance assurance;
+
+template "Prix en fonction de l'age"
+
+rule "remise_vs_anciennete_@{row.rowNumber}"
+when
+Conducteur(anciennete > @{anciennete})
+then
+assurance.setRemise(assurance.getRemise() + @{remise});
+end
+end template

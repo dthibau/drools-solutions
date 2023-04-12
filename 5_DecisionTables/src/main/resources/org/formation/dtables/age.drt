@@ -1,0 +1,20 @@
+template header
+ageMin
+ageMax
+prixBase
+
+package org.formation.drools.rules
+
+import org.formation.model.stateless.Conducteur;
+import org.formation.model.stateless.Assurance;
+
+template "Prix en fonction de l'age"
+
+rule "prix_vs_age_@{row.rowNumber}"
+when
+Conducteur(age > @{ageMin}, age <= @{ageMax})
+$a : Assurance()
+then
+$a.setPrixBase(@{prixBase}d);
+end
+end template

@@ -1,0 +1,54 @@
+package org.formation.model.stateless;
+//generated from Decision Table
+import org.formation.model.stateless.Conducteur;
+import org.formation.model.stateless.Assurance;
+global Assurance assurance;
+// rule values at C11, header at C6
+rule "Assurance_11"
+	when
+		conducteur : Conducteur(age >= 0, age <= 17)
+	then
+		assurance.setPrixBase(-1.00);
+end
+
+// rule values at C12, header at C6
+rule "Assurance_12"
+	when
+		conducteur : Conducteur(age >= 18, age <= 25)
+	then
+		assurance.setPrixBase(500.00d);
+end
+
+// rule values at C13, header at C6
+rule "Assurance_13"
+	when
+		conducteur : Conducteur(age >= 25, age <= 120)
+	then
+		assurance.setPrixBase(300.00d);
+end
+
+// rule values at C23, header at C18
+rule "Anciennete_23"
+	when
+		conducteur : Conducteur(anciennete >= 5)
+	then
+		assurance.setRemise(assurance.getRemise() + 10.00);
+end
+
+// rule values at C24, header at C18
+rule "Anciennete_24"
+	when
+		conducteur : Conducteur(anciennete >= 10)
+	then
+		assurance.setRemise(assurance.getRemise() + 10.00);
+end
+
+// rule values at C31, header at C26
+rule "Incidents_31"
+	when
+		conducteur : Conducteur(incidents > 0)
+	then
+		assurance.setRemise(assurance.getRemise() - 5*conducteur.getIncidents());
+end
+
+
