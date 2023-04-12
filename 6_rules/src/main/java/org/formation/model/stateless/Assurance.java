@@ -1,7 +1,10 @@
 package org.formation.model.stateless;
 
-public class Assurance {
+import java.io.Serializable;
 
+public class Assurance implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private Double prixBase;
 	private Double remise = 0d;
 	

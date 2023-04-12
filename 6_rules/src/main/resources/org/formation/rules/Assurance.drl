@@ -6,7 +6,13 @@ import org.formation.model.stateless.Conducteur;
 import org.formation.model.stateless.Assurance;
 
 
-
+rule "A dummy rule"
+  when
+    $o : Object()
+  then
+    System.out.println("RULE Assurance with NO CONDITION className is" + $o.getClass().getName());
+    
+end
 
 rule "conducteur entre 18 et 25 ans"
 

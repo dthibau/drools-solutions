@@ -21,7 +21,7 @@ public class TestAssurance {
 		ruleRunner = new RuleRunner();
 	}
 	
-//	@Test
+	@Test
 	public void test20(){
 		Conducteur c = new Conducteur(20, 0, 0);
 		Assurance a = new Assurance();

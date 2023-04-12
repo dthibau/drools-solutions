@@ -17,7 +17,7 @@ import org.kie.server.client.UserTaskServicesClient;
 
 public class Configuration {
 
-	private static final String URL = "http://localhost:8080/kie-server/services/rest/server";
+	private static final String URL = "http://localhost:8180/kie-server/services/rest/server";
 	private static final String USER = "kieserver";
 	private static final String PASSWORD = "kieserver1!";;
 
@@ -92,6 +92,10 @@ public class Configuration {
 
 	public static QueryServicesClient getQueryClient() {
 		return queryClient;
+	}
+
+	public static KieServicesClient getKieServicesClient() {
+		return kieServicesClient;
 	}
 
 	

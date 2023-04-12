@@ -33,7 +33,7 @@ public class RuleRunner {
 			throws Exception {
 	
 		// Instancier une session stateless
-		StatelessKieSession statelessKieSession = kieContainer.newStatelessKieSession();
+		StatelessKieSession statelessKieSession = kieContainer.newStatelessKieSession("insurance");
 		
 
 		// Exécuter les règles

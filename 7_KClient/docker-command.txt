@@ -1,0 +1,1 @@
+docker run -p 8081:8080 -v ~/Formations/Drools/MyWork/myM2:/opt/jboss/.m2 quay.io/kiegroup/kie-server-showcase:latest

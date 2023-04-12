@@ -1,15 +1,21 @@
-package org.formation.stateless.model;
+package org.formation.model.stateless;
 
-public class Assurance {
+import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+public class Assurance implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private Double prixBase;
 	private Double remise = 0d;
+	
 	
 	public Double getPrixBase() {
 		return prixBase;
 	}
 	public void setPrixBase(Double prixBase) {
 		this.prixBase = prixBase;
-		System.out.println("Assurance prixBase = "+this.prixBase);
 	}
 	public Double getRemise() {
 		return remise;
@@ -17,7 +23,9 @@ public class Assurance {
 	public void setRemise(Double remise) {
 		this.remise = remise;
 	}
-	public double getPrix(){
+	@JsonIgnore
+	public double getPrix() {
 		return prixBase != null ? prixBase - remise*prixBase/100 : -1;
 	}
+	
 }

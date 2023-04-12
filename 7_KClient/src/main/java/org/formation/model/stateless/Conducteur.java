@@ -1,17 +1,23 @@
-package org.formation.stateless.model;
+package org.formation.model.stateless;
 
-public class Conducteur {
+import java.io.Serializable;
+
+public class Conducteur implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private int age;
 	private int anciennete;
 	private int incidents;
 	
-	
-	public Conducteur(int age, int anciennete, int incidents) {
+	public Conducteur() {
 		super();
+	}
+	public Conducteur(int age, int anciennete, int incidents ) {
 		this.age = age;
 		this.anciennete = anciennete;
 		this.incidents = incidents;
 	}
+	
 	public int getAge() {
 		return age;
 	}
@@ -32,5 +38,4 @@ public class Conducteur {
 	}
 	
 	
-
 }
