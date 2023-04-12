@@ -8,7 +8,7 @@ public class ExcelCompilateur {
 	@SuppressWarnings("restriction")
 	public static void main(String[] args) {
 		
-		String fileName="/org/formation/dtables/assurance2.xlsx";
+		String fileName="/org/formation/dtables/assurance.xls";
 		if ( args.length  > 0 )
 			fileName = args[0];
 		SpreadsheetCompiler spc = new SpreadsheetCompiler();

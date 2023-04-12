@@ -6,6 +6,8 @@ services:
     ports:
     - 8080:8080
     - 8001:8001
+    volumes:
+      - /home/dthibau/Formations/Drools/MyWork/wb_git:/opt/jboss/wildfly/bin/.niogit:Z
   kie-server:
     image: quay.io/kiegroup/kie-server-showcase:latest 
     environment:
